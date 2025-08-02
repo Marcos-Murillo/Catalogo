@@ -40,16 +40,18 @@ if (isFirebaseConfigured) {
 
 export { db, storage }
 
+// Actualizar la interfaz Product para incluir el tipo
 export interface Product {
   id: string
   name: string
   price: number
   description: string
   imageUrl: string
+  type: "collar" | "anillo" | "forma" | "bruto"
   createdAt: Date
 }
 
-// Datos de ejemplo para cuando Firebase no esté disponible
+// Actualizar los datos de ejemplo para incluir tipos
 export const mockProducts: Product[] = [
   {
     id: "1",
@@ -58,6 +60,7 @@ export const mockProducts: Product[] = [
     description:
       "Hermoso cuarzo rosa natural que promueve el amor propio y la sanación emocional. Perfecto para meditación y equilibrio energético. Sus suaves tonos rosados transmiten paz y armonía.",
     imageUrl: "/placeholder.svg?height=400&width=400",
+    type: "bruto",
     createdAt: new Date("2024-01-15"),
   },
   {
@@ -67,24 +70,27 @@ export const mockProducts: Product[] = [
     description:
       "Amatista de alta calidad proveniente de Uruguay. Conocida por sus propiedades de protección espiritual y claridad mental. Su color púrpura intenso la convierte en una pieza única.",
     imageUrl: "/placeholder.svg?height=400&width=400",
+    type: "forma",
     createdAt: new Date("2024-01-14"),
   },
   {
     id: "3",
-    name: "Cuarzo Transparente",
+    name: "Collar de Cuarzo Transparente",
     price: 32000,
     description:
-      "Cuarzo transparente puro, amplificador de energía universal. Ideal para limpiar y cargar otros cristales. Su claridad excepcional refleja la pureza de la energía.",
+      "Collar elegante con cuarzo transparente puro, amplificador de energía universal. Ideal para uso diario y protección energética. Su claridad excepcional refleja la pureza de la energía.",
     imageUrl: "/placeholder.svg?height=400&width=400",
+    type: "collar",
     createdAt: new Date("2024-01-13"),
   },
   {
     id: "4",
-    name: "Citrino Natural",
+    name: "Anillo de Citrino Natural",
     price: 56000,
     description:
-      "Citrino natural que atrae la abundancia y prosperidad. Conocido como la piedra del éxito y la manifestación. Su color dorado irradia energía positiva y vitalidad.",
+      "Anillo artesanal con citrino natural que atrae la abundancia y prosperidad. Conocido como la piedra del éxito y la manifestación. Su color dorado irradia energía positiva y vitalidad.",
     imageUrl: "/placeholder.svg?height=400&width=400",
+    type: "anillo",
     createdAt: new Date("2024-01-12"),
   },
   {
@@ -94,15 +100,17 @@ export const mockProducts: Product[] = [
     description:
       "Poderosa piedra de protección que absorbe energías negativas y proporciona conexión a tierra. Esencial para la limpieza energética y protección del hogar.",
     imageUrl: "/placeholder.svg?height=400&width=400",
+    type: "bruto",
     createdAt: new Date("2024-01-11"),
   },
   {
     id: "6",
-    name: "Aventurina Verde",
+    name: "Collar de Aventurina Verde",
     price: 38000,
     description:
-      "Aventurina verde que promueve la suerte, prosperidad y crecimiento personal. Excelente para el chakra del corazón. Su energía suave fomenta la calma y el equilibrio emocional.",
+      "Collar de aventurina verde que promueve la suerte, prosperidad y crecimiento personal. Excelente para el chakra del corazón. Su energía suave fomenta la calma y el equilibrio emocional.",
     imageUrl: "/placeholder.svg?height=400&width=400",
+    type: "collar",
     createdAt: new Date("2024-01-10"),
   },
 ]
@@ -187,3 +195,11 @@ export const uploadImageToImgBB = async (file: File): Promise<string> => {
     throw error
   }
 }
+
+// Agregar tipos de productos disponibles
+export const productTypes = [
+  { value: "collar", label: "Collar" },
+  { value: "anillo", label: "Anillo" },
+  { value: "forma", label: "Forma" },
+  { value: "bruto", label: "En Bruto" },
+] as const

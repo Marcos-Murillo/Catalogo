@@ -57,6 +57,7 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
                     src={
                       product.imageUrl ||
                       "/placeholder.svg?height=600&width=600&query=beautiful crystal quartz gemstone" ||
+                      "/placeholder.svg" ||
                       "/placeholder.svg"
                     }
                     alt={product.name}
@@ -72,6 +73,29 @@ export function ProductModal({ product, isOpen, onClose }: ProductModalProps) {
                 <div>
                   {/* Header */}
                   <div className="mb-6">
+                    {/* Badge del tipo */}
+                    <div className="mb-3">
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+                          product.type === "collar"
+                            ? "bg-pink-100 text-pink-700"
+                            : product.type === "anillo"
+                              ? "bg-blue-100 text-blue-700"
+                              : product.type === "forma"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {product.type === "collar"
+                          ? "Collar"
+                          : product.type === "anillo"
+                            ? "Anillo"
+                            : product.type === "forma"
+                              ? "Forma"
+                              : "En Bruto"}
+                      </span>
+                    </div>
+
                     <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-3">{product.name}</h2>
                     <div className="text-3xl md:text-4xl font-bold text-purple-600 mb-4">
                       ${product.price.toLocaleString()}

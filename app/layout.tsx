@@ -6,8 +6,10 @@ import "./globals.css"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Galeria Espiritual - Cuarzos y Cristales",
-  description: "Descubre nuestra colección de cuarzos y cristales naturales para tu bienestar espiritual",
+  title: process.env.NEXT_PUBLIC_APP_NAME || "Galeria Espiritual - Cuarzos y Cristales",
+  description:
+    process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
+    "Descubre nuestra colección de cuarzos y cristales naturales para tu bienestar espiritual",
 }
 
 export default function RootLayout({

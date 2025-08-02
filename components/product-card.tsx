@@ -32,6 +32,29 @@ export function ProductCard({ product, onClick }: ProductCardProps) {
       </div>
 
       <div className="p-4">
+        {/* Agregar badge del tipo */}
+        <div className="flex items-center justify-between mb-2">
+          <span
+            className={`px-2 py-1 rounded-full text-xs font-medium ${
+              product.type === "collar"
+                ? "bg-pink-100 text-pink-700"
+                : product.type === "anillo"
+                  ? "bg-blue-100 text-blue-700"
+                  : product.type === "forma"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-700"
+            }`}
+          >
+            {product.type === "collar"
+              ? "Collar"
+              : product.type === "anillo"
+                ? "Anillo"
+                : product.type === "forma"
+                  ? "Forma"
+                  : "En Bruto"}
+          </span>
+        </div>
+
         <h3 className="font-semibold text-gray-800 text-lg mb-2 line-clamp-1">{product.name}</h3>
         <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
         <div className="flex items-center justify-between">

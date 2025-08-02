@@ -5,7 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { doc, updateDoc, Timestamp } from "firebase/firestore"
-import { db, isFirebaseAvailable, uploadImageToImgBB, type Product } from "@/lib/firebase"
+import { db, isFirebaseAvailable, uploadImageToImgBB, type Product, productTypes } from "@/lib/firebase"
 import { X, Upload, DollarSign, Type, FileText, Save } from "lucide-react"
 import Image from "next/image"
 
@@ -21,6 +21,7 @@ export function EditProductModal({ product, isOpen, onClose, onUpdate }: EditPro
     name: product.name,
     price: product.price.toString(),
     description: product.description,
+    type: product.type,
   })
   const [newImage, setNewImage] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -72,6 +73,7 @@ export function EditProductModal({ product, isOpen, onClose, onUpdate }: EditPro
           name: formData.name.trim(),
           price: Number.parseFloat(formData.price),
           description: formData.description.trim(),
+          type: formData.type,
           imageUrl,
           updatedAt: Timestamp.now(),
         })
@@ -83,6 +85,7 @@ export function EditProductModal({ product, isOpen, onClose, onUpdate }: EditPro
         name: formData.name.trim(),
         price: Number.parseFloat(formData.price),
         description: formData.description.trim(),
+        type: formData.type,
         imageUrl,
       }
 
@@ -223,6 +226,25 @@ export function EditProductModal({ product, isOpen, onClose, onUpdate }: EditPro
                       required
                     />
                   </div>
+                </div>
+
+                {/* Tipo de Producto */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Tipo de Producto</label>
+                  <select
+                    value={formData.type}
+                    onChange={(e) =>
+                      setFormData({ ...formData, type: e.target.value as "collar" | "anillo" | "forma" | "bruto" })
+                    }
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                    required
+                  >
+                    {productTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 {/* Descripción */}

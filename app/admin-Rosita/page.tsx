@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { collection, getDocs, deleteDoc, doc, orderBy, query } from "firebase/firestore"
-import { ref, deleteObject } from "firebase/storage"
-import { db, storage, type Product, mockProducts, isFirebaseAvailable } from "@/lib/firebase"
+import { db, type Product, mockProducts, isFirebaseAvailable } from "@/lib/firebase"
 import { AddProductForm } from "@/components/add-product-form"
 import { EditProductModal } from "@/components/edit-product-modal"
 import { ArrowLeft, Sparkles, Trash2, Edit, Plus } from "lucide-react"
@@ -47,13 +46,7 @@ export default function AdminPage() {
     if (!confirm(`¿Estás seguro de eliminar "${product.name}"?`)) return
 
     try {
-      if (isFirebaseAvailable && db && storage) {
-        // Eliminar imagen de Storage
-        if (product.imageUrl && product.imageUrl.includes("firebase")) {
-          const imageRef = ref(storage, product.imageUrl)
-          await deleteObject(imageRef).catch(console.warn)
-        }
-
+      if (isFirebaseAvailable && db) {
         // Eliminar documento de Firestore
         await deleteDoc(doc(db, "products", product.id))
 
@@ -80,6 +73,8 @@ export default function AdminPage() {
     setEditingProduct(null)
   }
 
+  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Galeria Espiritual"
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       {/* Header */}
@@ -103,7 +98,7 @@ export default function AdminPage() {
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">Panel de Administración</h1>
-                  <p className="text-sm text-gray-600">Galeria Espiritual</p>
+                  <p className="text-sm text-gray-600">{appName}</p>
                 </div>
               </div>
             </div>
@@ -171,6 +166,29 @@ export default function AdminPage() {
                     </div>
 
                     <div className="p-6">
+                      {/* Agregar badge del tipo */}
+                      <div className="mb-2">
+                        <span
+                          className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                            product.type === "collar"
+                              ? "bg-pink-100 text-pink-700"
+                              : product.type === "anillo"
+                                ? "bg-blue-100 text-blue-700"
+                                : product.type === "forma"
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {product.type === "collar"
+                            ? "Collar"
+                            : product.type === "anillo"
+                              ? "Anillo"
+                              : product.type === "forma"
+                                ? "Forma"
+                                : "En Bruto"}
+                        </span>
+                      </div>
+
                       <h3 className="font-bold text-xl text-gray-800 mb-2">{product.name}</h3>
                       <p className="text-2xl font-bold text-purple-600 mb-3">${product.price.toLocaleString()}</p>
                       <p className="text-gray-600 text-sm mb-4 line-clamp-3">{product.description}</p>
