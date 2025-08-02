@@ -1,0 +1,219 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
+import { collection, getDocs, deleteDoc, doc, orderBy, query } from "firebase/firestore"
+import { ref, deleteObject } from "firebase/storage"
+import { db, storage, type Product, mockProducts, isFirebaseAvailable } from "@/lib/firebase"
+import { AddProductForm } from "@/components/add-product-form"
+import { EditProductModal } from "@/components/edit-product-modal"
+import { ArrowLeft, Sparkles, Trash2, Edit, Plus } from "lucide-react"
+import Link from "next/link"
+import Image from "next/image"
+
+export default function AdminPage() {
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [showAddForm, setShowAddForm] = useState(false)
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
+
+  const fetchProducts = async () => {
+    try {
+      if (isFirebaseAvailable && db) {
+        const q = query(collection(db, "products"), orderBy("createdAt", "desc"))
+        const querySnapshot = await getDocs(q)
+        const productsData = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate() || new Date(),
+        })) as Product[]
+        setProducts(productsData)
+      } else {
+        setProducts(mockProducts)
+      }
+    } catch (error) {
+      console.error("Error al cargar productos:", error)
+      setProducts(mockProducts)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+  }, [])
+
+  const handleDelete = async (product: Product) => {
+    if (!confirm(`¿Estás seguro de eliminar "${product.name}"?`)) return
+
+    try {
+      if (isFirebaseAvailable && db && storage) {
+        // Eliminar imagen de Storage
+        if (product.imageUrl && product.imageUrl.includes("firebase")) {
+          const imageRef = ref(storage, product.imageUrl)
+          await deleteObject(imageRef).catch(console.warn)
+        }
+
+        // Eliminar documento de Firestore
+        await deleteDoc(doc(db, "products", product.id))
+
+        // Actualizar lista local
+        setProducts(products.filter((p) => p.id !== product.id))
+        alert("Producto eliminado exitosamente")
+      } else {
+        // Simular eliminación en modo demo
+        setProducts(products.filter((p) => p.id !== product.id))
+        alert("Producto eliminado (modo demo)")
+      }
+    } catch (error) {
+      console.error("Error al eliminar producto:", error)
+      alert("Error al eliminar el producto")
+    }
+  }
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product)
+  }
+
+  const handleUpdateProduct = (updatedProduct: Product) => {
+    setProducts(products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p)))
+    setEditingProduct(null)
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
+      {/* Header */}
+      <header className="bg-white/80 backdrop-blur-md shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gray-100 hover:bg-gray-200 p-2 rounded-xl transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </motion.button>
+              </Link>
+
+              <div className="flex items-center gap-3">
+                <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-2 rounded-xl">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-800">Panel de Administración</h1>
+                  <p className="text-sm text-gray-600">Galeria Espiritual</p>
+                </div>
+              </div>
+            </div>
+
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setShowAddForm(!showAddForm)}
+              className="bg-purple-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-medium shadow-lg hover:bg-purple-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              {showAddForm ? "Ver Productos" : "Agregar Cuarzo"}
+            </motion.button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {showAddForm ? (
+          <AddProductForm />
+        ) : (
+          <div>
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">Productos en el Catálogo</h2>
+              <p className="text-gray-600">Gestiona todos los cuarzos de tu inventario</p>
+            </div>
+
+            {isLoading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-gray-200 rounded-2xl h-64 animate-pulse" />
+                ))}
+              </div>
+            ) : products.length === 0 ? (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
+                <Sparkles className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-2xl font-semibold text-gray-600 mb-2">No hay productos</h3>
+                <p className="text-gray-500 mb-6">Comienza agregando tu primer cuarzo</p>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setShowAddForm(true)}
+                  className="bg-purple-600 text-white px-6 py-3 rounded-xl font-medium"
+                >
+                  Agregar Primer Producto
+                </motion.button>
+              </motion.div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {products.map((product) => (
+                  <motion.div
+                    key={product.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden"
+                  >
+                    <div className="relative aspect-square">
+                      <Image
+                        src={product.imageUrl || "/placeholder.svg"}
+                        alt={product.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+
+                    <div className="p-6">
+                      <h3 className="font-bold text-xl text-gray-800 mb-2">{product.name}</h3>
+                      <p className="text-2xl font-bold text-purple-600 mb-3">${product.price.toLocaleString()}</p>
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">{product.description}</p>
+
+                      <div className="flex gap-2">
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleEdit(product)}
+                          className="flex-1 bg-blue-500 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-blue-600 transition-colors"
+                        >
+                          <Edit className="w-4 h-4" />
+                          Editar
+                        </motion.button>
+
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => handleDelete(product)}
+                          className="flex-1 bg-red-500 text-white py-2 px-4 rounded-xl flex items-center justify-center gap-2 hover:bg-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Eliminar
+                        </motion.button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* Edit Modal */}
+      {editingProduct && (
+        <EditProductModal
+          product={editingProduct}
+          isOpen={!!editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onUpdate={handleUpdateProduct}
+        />
+      )}
+    </div>
+  )
+}
