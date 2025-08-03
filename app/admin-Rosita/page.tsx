@@ -93,9 +93,18 @@ export default function AdminPage() {
               </Link>
 
               <div className="flex items-center gap-3">
-                <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-2 rounded-xl">
-                  <Sparkles className="w-6 h-6 text-white" />
-                </div>
+                <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 p-1">
+                                <div className="w-full h-full bg-transparent rounded-lg flex items-center justify-center">
+                                  <Image
+                                    src="/logo.png"
+                                    alt="Logo Galeria Espiritual"
+                                    width={45}
+                                    height={45}
+                                    className="object-contain"
+                                    priority
+                                  />
+                                </div>
+                              </div>
                 <div>
                   <h1 className="text-2xl font-bold text-gray-800">Panel de Administración</h1>
                   <p className="text-sm text-gray-600">{appName}</p>
