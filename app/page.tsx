@@ -7,9 +7,14 @@ import { db, type Product, mockProducts, isFirebaseAvailable } from "@/lib/fireb
 import { ProductCard } from "@/components/product-card"
 import { ProductModal } from "@/components/product-modal"
 import Link from "next/link"
-import { ProductFilters } from "@/components/product-filter"
-import { Plus, Search } from "lucide-react"
+import { ProductFilters } from "@/components/product-filters"
+import { Search } from "lucide-react"
 import Image from "next/image"
+import { useSearchParams } from "next/navigation"
+import { AddVariantModal } from "@/components/add-variant-modal"
+import { Navigation } from "@/components/navigation"
+import { Footer } from "@/components/footer"
+import { RecommendedProducts } from "@/components/recommended-products"
 
 export default function HomePage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -17,6 +22,9 @@ export default function HomePage() {
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedType, setSelectedType] = useState("all")
+  const [selectedVariantProduct, setSelectedVariantProduct] = useState<Product | null>(null)
+
+  const searchParams = useSearchParams()
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -71,44 +79,49 @@ export default function HomePage() {
     }
   }, [])
 
+  useEffect(() => {
+    const q = searchParams?.get("q") || ""
+    if (q) setSearchTerm(q)
+  }, [searchParams])
+
+  useEffect(() => {
+    // Listener para abrir modal de añadir variante
+    const handleOpenAddVariant = (event: any) => {
+      const product = event.detail
+      setSelectedVariantProduct(product)
+    }
+
+    // Listener para notificaciones del carrito
+    const handleCartItemAdded = (event: any) => {
+      const { productName, quantity, weight } = event.detail
+      const weightText = weight ? ` (${weight}g)` : ""
+      // Aquí podrías mostrar una notificación toast
+      console.log(`✅ ${quantity}x ${productName}${weightText} agregado al carrito`)
+    }
+
+    window.addEventListener("openAddVariant", handleOpenAddVariant)
+    window.addEventListener("cartItemAdded", handleCartItemAdded)
+
+    return () => {
+      window.removeEventListener("openAddVariant", handleOpenAddVariant)
+      window.removeEventListener("cartItemAdded", handleCartItemAdded)
+    }
+  }, [])
+
   const appName = process.env.NEXT_PUBLIC_APP_NAME || "Galeria Espiritual"
   const appDescription = process.env.NEXT_PUBLIC_APP_DESCRIPTION || "Cuarzos y cristales naturales"
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              className="flex items-center gap-3"
-            >
-              {/* Reemplazar Sparkles con logo PNG */}
-              <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 p-1">
-                <div className="w-full h-full bg-transparent rounded-lg flex items-center justify-center">
-                  <Image
-                    src="/logo.png"
-                    alt="Logo Galeria Espiritual"
-                    width={45}
-                    height={45}
-                    className="object-contain"
-                    priority
-                  />
-                </div>
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-800">{appName}</h1>
-                <p className="text-sm text-gray-600">{appDescription}</p>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-      </header>
+      <Navigation />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Main Content - Se ajusta cuando el modal está abierto pero mantiene interactividad */}
+      <main
+        className={`transition-all duration-300 ${
+          selectedProduct ? "max-w-5xl mr-auto ml-4 sm:ml-6 lg:ml-8 pr-4" : "max-w-7xl mx-auto"
+        } px-4 sm:px-6 lg:px-8 py-8`}
+      >
         {/* Filtros de búsqueda */}
         {!isLoading && products.length > 0 && (
           <ProductFilters
@@ -139,7 +152,9 @@ export default function HomePage() {
 
         {/* Products Grid */}
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <div
+            className={`grid gap-4 sm:gap-6 ${selectedProduct ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"}`}
+          >
             {[...Array(8)].map((_, i) => (
               <div key={i} className="bg-gray-200 rounded-2xl aspect-[3/4] animate-pulse" />
             ))}
@@ -180,16 +195,40 @@ export default function HomePage() {
             )}
           </motion.div>
         ) : (
-          <motion.div layout className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          <motion.div
+            layout
+            className={`grid gap-4 sm:gap-6 transition-all duration-300 ${
+              selectedProduct
+                ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                : "grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            }`}
+          >
+            {/* NO pasar showAddStoneButton=true aquí, solo en admin */}
             {filteredProducts.map((product) => (
               <ProductCard key={product.id} product={product} onClick={() => setSelectedProduct(product)} />
             ))}
           </motion.div>
         )}
+
+        {/* Productos recomendados - solo mostrar si hay productos y no hay filtros activos */}
+        {!isLoading && products.length > 0 && !searchTerm && selectedType === "all" && !selectedProduct && (
+          <RecommendedProducts products={products} onProductClick={setSelectedProduct} />
+        )}
       </main>
 
       {/* Product Modal */}
       <ProductModal product={selectedProduct} isOpen={!!selectedProduct} onClose={() => setSelectedProduct(null)} />
+
+      {/* Modal para añadir variante */}
+      <AddVariantModal
+        product={selectedVariantProduct}
+        isOpen={!!selectedVariantProduct}
+        onClose={() => setSelectedVariantProduct(null)}
+        onVariantAdded={fetchProducts}
+      />
+
+      {/* Footer - siempre visible */}
+      <Footer />
     </div>
   )
 }

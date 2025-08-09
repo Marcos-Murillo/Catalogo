@@ -6,8 +6,8 @@ import { collection, getDocs, deleteDoc, doc, orderBy, query } from "firebase/fi
 import { db, type Product, mockProducts, isFirebaseAvailable } from "@/lib/firebase"
 import { AddProductForm } from "@/components/add-product-form"
 import { EditProductModal } from "@/components/edit-product-modal"
-import { ArrowLeft, Sparkles, Trash2, Edit, Plus } from "lucide-react"
-import Link from "next/link"
+import { AdminNavigation } from "@/components/admin-navigation"
+import { Trash2, Edit } from 'lucide-react'
 import Image from "next/image"
 
 export default function AdminPage() {
@@ -47,14 +47,10 @@ export default function AdminPage() {
 
     try {
       if (isFirebaseAvailable && db) {
-        // Eliminar documento de Firestore
         await deleteDoc(doc(db, "products", product.id))
-
-        // Actualizar lista local
         setProducts(products.filter((p) => p.id !== product.id))
         alert("Producto eliminado exitosamente")
       } else {
-        // Simular eliminación en modo demo
         setProducts(products.filter((p) => p.id !== product.id))
         alert("Producto eliminado (modo demo)")
       }
@@ -73,57 +69,13 @@ export default function AdminPage() {
     setEditingProduct(null)
   }
 
-  const appName = process.env.NEXT_PUBLIC_APP_NAME || "Galeria Espiritual"
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Link href="/">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gray-100 hover:bg-gray-200 p-2 rounded-xl transition-colors"
-                >
-                  <ArrowLeft className="w-5 h-5" />
-                </motion.button>
-              </Link>
-
-              <div className="flex items-center gap-3">
-                <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 p-1">
-                                <div className="w-full h-full bg-transparent rounded-lg flex items-center justify-center">
-                                  <Image
-                                    src="/logo.png"
-                                    alt="Logo Galeria Espiritual"
-                                    width={45}
-                                    height={45}
-                                    className="object-contain"
-                                    priority
-                                  />
-                                </div>
-                              </div>
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-800">Panel de Administración</h1>
-                  <p className="text-sm text-gray-600">{appName}</p>
-                </div>
-              </div>
-            </div>
-
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setShowAddForm(!showAddForm)}
-              className="bg-purple-600 text-white px-4 py-2 rounded-xl flex items-center gap-2 font-medium shadow-lg hover:bg-purple-700 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              {showAddForm ? "Ver Productos" : "Agregar Cuarzo"}
-            </motion.button>
-          </div>
-        </div>
-      </header>
+      {/* Header con navegación específica de admin */}
+      <AdminNavigation 
+        showAddForm={showAddForm} 
+        onToggleAddForm={() => setShowAddForm(!showAddForm)} 
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -144,7 +96,9 @@ export default function AdminPage() {
               </div>
             ) : products.length === 0 ? (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
-                <Sparkles className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <div className="relative w-16 h-16 mx-auto mb-4 opacity-40">
+                  <Image src="/logo.png" alt="Logo" fill className="object-contain grayscale" />
+                </div>
                 <h3 className="text-2xl font-semibold text-gray-600 mb-2">No hay productos</h3>
                 <p className="text-gray-500 mb-6">Comienza agregando tu primer cuarzo</p>
                 <motion.button
@@ -175,7 +129,6 @@ export default function AdminPage() {
                     </div>
 
                     <div className="p-6">
-                      {/* Agregar badge del tipo */}
                       <div className="mb-2">
                         <span
                           className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
