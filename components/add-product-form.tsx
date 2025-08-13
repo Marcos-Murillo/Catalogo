@@ -16,7 +16,7 @@ export function AddProductForm() {
     name: "",
     price: "",
     description: "",
-    type: "bruto" as "collar" | "anillo" | "forma" | "bruto",
+    type: "bruto" as "collar" | "anillo" | "forma" | "bruto" | "pulsera" | "rodado",
     spiritualProperties: "",
     // Campos para piedras en bruto (nueva lógica)
     minWeight: "",
@@ -272,7 +272,7 @@ export function AddProductForm() {
           <select
             value={formData.type}
             onChange={(e) =>
-              setFormData({ ...formData, type: e.target.value as "collar" | "anillo" | "forma" | "bruto" })
+              setFormData({ ...formData, type: e.target.value as "collar" | "anillo" | "forma" | "bruto" | "pulsera" | "rodado" })
             }
             className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
             required

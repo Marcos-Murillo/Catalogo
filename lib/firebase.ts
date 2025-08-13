@@ -316,6 +316,8 @@ export const productTypes = [
   { value: "anillo", label: "Anillo" },
   { value: "forma", label: "Forma" },
   { value: "bruto", label: "En Bruto" },
+  { value: "pulsera", label: "Pulsera" },
+  { value: "rorado", label: "Rodado" },
 ] as const
 
 // Funciones para el carrito actualizadas
