@@ -109,7 +109,7 @@ export default function HomePage() {
   }, [])
 
   const appName = process.env.NEXT_PUBLIC_APP_NAME || "Galeria Espiritual"
-  const appDescription = process.env.NEXT_PUBLIC_APP_DESCRIPTION || "Cuarzos y cristales naturales"
+  const appDescription = process.env.NEXT_PUBLIC_APP_DESCRIPTION || "Conexión para la vida"
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50">
