@@ -47,7 +47,7 @@ export function Footer() {
                 className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors"
               >
                 <Phone className="w-4 h-4" />
-                <span>+57 312 345 6789</span>
+                <span>+57 3104412515</span>
               </a>
               <a
                 href="mailto:info@galeriaespiritual.com"
@@ -93,9 +93,6 @@ export function Footer() {
               </Link>
               <Link href="/carrito" className="block text-gray-300 hover:text-white transition-colors text-sm">
                 Carrito
-              </Link>
-              <Link href="/admin" className="block text-gray-300 hover:text-white transition-colors text-sm">
-                Administración
               </Link>
             </div>
           </div>
