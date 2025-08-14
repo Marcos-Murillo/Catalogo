@@ -28,7 +28,7 @@ export function Footer() {
               </div>
               <div>
                 <h3 className="text-xl font-bold">{appName}</h3>
-                <p className="text-gray-400 text-sm">Cuarzos y cristales naturales</p>
+                <p className="text-gray-400 text-sm">Conexión para la vida</p>
               </div>
             </div>
             <p className="text-gray-300 text-sm">
@@ -54,11 +54,11 @@ export function Footer() {
                 className="flex items-center gap-3 text-gray-300 hover:text-white transition-colors"
               >
                 <Mail className="w-4 h-4" />
-                <span>info@galeriaespiritual.com</span>
+                <span>galeriaespiritual@gmail.com</span>
               </a>
               <div className="flex items-center gap-3 text-gray-300">
                 <MapPin className="w-4 h-4" />
-                <span>Bogotá, Colombia</span>
+                <span>Colombia</span>
               </div>
             </div>
           </div>
@@ -68,7 +68,7 @@ export function Footer() {
             <h4 className="text-lg font-semibold">Síguenos</h4>
             <div className="flex gap-4">
               <a
-                href="https://instagram.com/galeriaespiritual"
+                href="https://www.instagram.com/galeriaespiritual?igsh=cGlqNGd4czA4MXpt"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-gradient-to-r from-pink-500 to-purple-600 p-3 rounded-xl hover:scale-105 transition-transform"
@@ -76,7 +76,7 @@ export function Footer() {
                 <Instagram className="w-5 h-5" />
               </a>
               <a
-                href="https://facebook.com/galeriaespiritual"
+                href="https://www.facebook.com/profile.php?id=100083231491970"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-blue-600 p-3 rounded-xl hover:scale-105 transition-transform"

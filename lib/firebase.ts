@@ -320,7 +320,7 @@ export const productTypes = [
   { value: "rorado", label: "Rodado" },
 ] as const
 
-// Funciones para el carrito actualizadas
+// carrito 
 export const getCartItems = (): CartItem[] => {
   if (typeof window === "undefined") return []
   const items = localStorage.getItem("cart")
